@@ -1,0 +1,4 @@
+node_modules/
+angular_modules/
+dist/
+config/config.json

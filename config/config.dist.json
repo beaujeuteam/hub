@@ -1,0 +1,57 @@
+{
+    "dev": {
+        "db": {
+            "host": "xx.xx.xx.xx",
+            "dbname": "db",
+            "user": "root",
+            "password": "root",
+            "port": 27017,
+            "useCache": false
+        },
+        "modules": {
+            "auth": {
+                "clientId": "my-client",
+                "urls": {
+                    "formLogin": "https://auth.com/login",
+                    "formSignup": "https://auth.com/signup",
+                    "formUpdate": "https://auth.com/update",
+                    "authorize": "https://auth.com/authorize",
+                    "refresh": "https://auth.com/refresh",
+                    "validate": "https://auth.com/validate",
+                    "users": "https://auth.com/users",
+                    "signup": "https://auth.com/signup",
+                    "update": "https://auth.com/update"
+                },
+                "scopes": []
+            }
+        }
+    },
+
+    "production": {
+        "db": {
+            "host": "xx.xx.xx.xx",
+            "dbname": "db",
+            "user": "root",
+            "password": "root",
+            "port": 27017,
+            "useCache": true
+        },
+        "modules": {
+            "auth": {
+                "clientId": "my-client",
+                "urls": {
+                    "formLogin": "https://auth.com/login",
+                    "formSignup": "https://auth.com/signup",
+                    "formUpdate": "https://auth.com/update",
+                    "authorize": "https://auth.com/authorize",
+                    "refresh": "https://auth.com/refresh",
+                    "validate": "https://auth.com/validate",
+                    "users": "https://auth.com/users",
+                    "signup": "https://auth.com/signup",
+                    "update": "https://auth.com/update"
+                },
+                "scopes": []
+            }
+        }
+    }
+}

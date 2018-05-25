@@ -1,0 +1,38 @@
+doctype html
+html(lang="en")
+    head
+        meta(charset="utf-8")
+        title Beaujeuteam
+        
+        meta(name="viewport", content="width=device-width")
+        meta(name="description", content="my app")
+        meta(name="author", content="Kevin Balicot <kevinbalicot@gmail.com>")
+            
+        meta(property="og:title", content="my app")
+        meta(property="og:type", content="website")
+        meta(property="og:url", content="https://localhost:8080")
+        meta(property="og:image", content="https://localhost:8080")
+            
+        link(rel="icon", type="image/png", href="https://localhost:8080")
+            
+        link(rel="stylesheet", href="/modules/font-awesome/css/font-awesome.min.css")
+        //link(rel="stylesheet", href="/modules/bootstrap/dist/css/bootstrap.min.css")
+        link(rel="stylesheet", href="/modules/simplemde/dist/simplemde.min.css")
+        link(rel="stylesheet", href="/styles/theme.css")
+        link(rel="stylesheet", href="/styles/main.css")
+
+        script(src="/modules/popper.js/dist/umd/popper.min.js", charset="utf-8")
+        script(src="/modules/jquery/dist/jquery.min.js", charset="utf-8")
+        script(src="/modules/bootstrap/dist/js/bootstrap.min.js", charset="utf-8")
+        script(src="/modules/showdown/dist/showdown.min.js", charset="utf-8")
+        
+        base(href="/")
+    body
+        app-component
+            section.loading-banner
+                h1 Beaujeuteam
+        
+        script
+            | const CONFIG = !{JSON.stringify(config)};
+        script(src="/dist/app.js", charset="utf-8")
+        

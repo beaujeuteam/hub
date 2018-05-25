@@ -1,0 +1,47 @@
+html {
+    position: relative;
+    min-height: 100%;
+}
+
+section.container {
+    margin: 50px auto 100px auto;
+}
+
+.footer {
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    padding: 10px;
+
+    text-align: right;
+    background-color: #2E3234;
+    color: white;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.loading-banner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: #007BFF;
+    text-shadow: 4px 4px 0px rgba(0, 0, 0, .2);
+}
+
+.loading-banner h1 {
+    color: white;
+}
+
+.category-container {
+    border-bottom: solid 1px rgba(0,0,0,.1);
+    margin-bottom: 20px;
+}
+
+.topic-container {
+    border-bottom: solid 1px rgba(0,0,0,.1);
+    margin-bottom: 20px;
+}
