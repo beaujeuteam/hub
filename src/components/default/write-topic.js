@@ -1,11 +1,10 @@
-import { Component, core } from 'angular-js-proxy';
+import { Component, router } from 'angular-js-proxy';
 
-import { Repository } from './../../../modules/common';
-import { CommonUtils } from './../../../modules/common';
+import { Repository, CommonUtils } from 'pxl-angular-common';
 
 @Component({
     template: `
-        <header class="text-center bg-light p-4">
+        <header class="text-center bg-success text-white p-4">
             <h2>Nouveau topic</h2>
             <span *ngIf="!!category">{{ category.name }}</span>
         </header>
@@ -29,7 +28,7 @@ import { CommonUtils } from './../../../modules/common';
             </section>
         </section>
     `,
-    providers: [Repository, CommonUtils]
+    inject: [Repository, CommonUtils, router.ActivatedRoute, router.Router]
 })
 export class WriteTopicComponent {
     constructor(repository, utils, ActivatedRoute, Router) {
@@ -48,23 +47,20 @@ export class WriteTopicComponent {
             mentions: [],
             mimetype: 'markdown',
             type: 'topic',
-            target: { type: 'category', id: null }
-        }
+            target: { type: 'category', id: null },
+            metadata: { pinned: false, blocked: false }
+        };
     }
 
     ngOnInit() {
         this.sub = this.route.params.subscribe(params => {
             if (!!params.id) {
-                this.repository.query('find-category', { id: params.id }, query => {
+                this.repository.query('forum:categories:get', { id: params.id }, query => {
                     this.category = query.result;
                     this.data.target.id = this.category._id;
                 });
             }
         });
-    }
-
-    ngOnDestroy() {
-        this.repository.clear();
     }
 
     onEditorChange(event) {
@@ -81,7 +77,7 @@ export class WriteTopicComponent {
         }
 
         this.loading = false;
-        this.repository.query('insert-message', this.data, query => {
+        this.repository.query('messages:insert', this.data, query => {
             const topic = query.result.ops[0];
             this.router.navigate(['/forum/topic', topic._id, this.utils.stringToURL(topic.title)]);
             this.loading = true;

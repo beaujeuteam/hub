@@ -1,1 +1,5 @@
-export default [];
+import { GamesRepository } from './games';
+
+export default [
+    GamesRepository
+];

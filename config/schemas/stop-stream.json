@@ -1,0 +1,6 @@
+{
+    "streamId": {
+        "_type": "string",
+        "_required": true
+    }
+}

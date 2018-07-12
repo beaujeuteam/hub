@@ -1,0 +1,62 @@
+import { Component, core } from 'angular-js-proxy';
+
+import flvjs from 'flv.js';
+
+@Component({
+    selector: 'stream-video-component',
+    inputs: ['id', 'width', 'height', 'poster', 'auto'],
+    template: `
+        <video></video>
+    `,
+    providers: [core.ElementRef]
+})
+export class StreamVideoComponent {
+    constructor(ElementRef) {
+        this.element = ElementRef.nativeElement;
+        this.id = null;
+        this.width = null;
+        this.height = null;
+        this.poster = null;
+        this.auto = false;
+
+        this.player = null;
+    }
+
+    ngOnInit() {
+        const element = this.element.querySelector('video');
+        if (!!this.width) {
+            element.width = `${this.width}px`;
+        }
+
+        if (!!this.height) {
+            element.height = `${this.height}px`;
+        }
+
+        if (!!this.auto) {
+            element.width = this.element.parentElement.offsetWidth;
+        }
+
+        if (!!this.poster) {
+            element.poster = this.poster;
+        }
+
+        this.player = flvjs.createPlayer({
+            type: 'flv',
+            url: `ws://92.222.88.16:8981/live/${this.id}.flv`
+        });
+    }
+
+    ngAfterViewInit() {
+        const element = this.element.querySelector('video');
+        element.controls = true;
+
+        this.player.attachMediaElement(element);
+        this.player.load();
+    }
+
+    ngOnDestroy() {
+        if (null !== this.player) {
+            this.player.destroy();
+        }
+    }
+}

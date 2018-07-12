@@ -1,6 +1,6 @@
 import { Component } from 'angular-js-proxy';
 
-import { Repository, CommonUtils } from './../../../modules/common';
+import { Repository, CommonUtils } from 'pxl-angular-common';
 
 @Component({
     selector: 'category-label-component',
@@ -13,7 +13,7 @@ import { Repository, CommonUtils } from './../../../modules/common';
             {{ category.name }}
         </a>
     `,
-    providers: [Repository, CommonUtils]
+    inject: [Repository, CommonUtils]
 })
 export class CategoryLabelComponent {
     constructor(repository, utils) {
@@ -21,15 +21,12 @@ export class CategoryLabelComponent {
         this.utils = utils;
 
         this.category = null;
+        this.query = null;
     }
 
     ngOnInit() {
-        this.repository.query('find-category', { id: this.id }, (query) => {
+        this.repository.query('forum:categories:get', { id: this.id }, (query) => {
             this.category = query.result;
         });
-    }
-
-    ngOnDestroy() {
-        this.repository.clear();
     }
 }

@@ -5,7 +5,7 @@ import localeFr from './../config/locale';
 common.registerLocaleData(localeFr);
 
 const { enableProdMode, LOCALE_ID } = core;
-const { RouterModule, Router } = router;
+const { RouterModule } = router;
 
 import boxstore from 'boxstore';
 boxstore.set(CONFIG, { immutable: true });
@@ -15,14 +15,17 @@ import { ProfileComponent } from './components/default/profile';
 import { ForumComponent } from './components/default/forum';
 import { TopicComponent } from './components/default/topic';
 import { WriteTopicComponent } from './components/default/write-topic';
+import { CommunityComponent } from './components/default/community';
+import { StreamComponent } from './components/default/stream';
+import { GameComponent } from './components/default/game';
 
 import defaultComponents from './components/default';
 import utilsComponents from './components/utils';
 import services from './services';
 
-import { CommonModule, Client } from './../modules/common';
-import { AuthModule, Auth } from './../modules/auth';
-import { SocialModule } from './../modules/social';
+import { CommonModule, Client } from 'pxl-angular-common';
+import { AuthModule, Auth } from 'pxl-angular-auth';
+import { SocialModule } from 'pxl-angular-social';
 
 const routing = RouterModule.forRoot([
     { path: '', component: HomeComponent },
@@ -30,7 +33,11 @@ const routing = RouterModule.forRoot([
     { path: 'forum', component: ForumComponent, canActivate: [Auth] },
     { path: 'forum/category/:id/:name', component: ForumComponent, canActivate: [Auth] },
     { path: 'forum/category/:id/:name/new-topic', component: WriteTopicComponent, canActivate: [Auth] },
-    { path: 'forum/topic/:id/:name', component: TopicComponent, canActivate: [Auth] }
+    { path: 'forum/topic/:id/:name', component: TopicComponent, canActivate: [Auth] },
+    { path: 'community', component: CommunityComponent, canActivate: [Auth] },
+    { path: 'community/:type', component: CommunityComponent, canActivate: [Auth] },
+    { path: 'community/game/:id/:name', component: GameComponent, canActivate: [Auth] },
+    { path: 'stream/:username', component: StreamComponent, canActivate: [Auth] }
 ], { useHash: true });
 
 @Component({
@@ -48,12 +55,13 @@ const routing = RouterModule.forRoot([
             - <a target="_blank" [href]="'https://firewall.oauthorize.tk/privacy-policy?client_id=' + auth.clientId">Privacy policy</a>
         </footer>
     `,
-    providers: [Auth, Client]
+    inject: [Auth, Client]
 })
 class AppComponent {
     constructor (auth, client) {
         this.auth = auth;
         this.client = client;
+
         this.config = { version: CONFIG.version, name: CONFIG.name };
         this.year = (new Date()).getFullYear();
         this.connected = false;
@@ -66,14 +74,23 @@ class AppComponent {
             this.connected = true;
         });
 
-        if (this.auth.isAuthenticated()) {
-            if (boxstore.get('env') === 'production') {
-                this.client.connect(`wss://${window.location.host}?token=${this.auth.token}`);
-            } else {
-                this.client.on('open', () => logger.debug(`Connected with database at ws://${window.location.host}`));
-                this.client.connect(`ws://${window.location.host}?token=${this.auth.token}`);
-            }
+        this.client.on('close', () => {
+            this.connected = false;
+        });
+
+        let uri = '';
+        if (boxstore.get('env') === 'production') {
+            uri = `wss://${window.location.host}`;
+        } else {
+            uri = `ws://${window.location.host}`;
+            this.client.on('open', () => logger.debug(`Connected with database at ${uri}`));
         }
+
+        if (this.auth.isAuthenticated()) {
+            uri += `?token=${this.auth.token}`;
+        }
+
+        this.client.connect(uri);
     }
 }
 

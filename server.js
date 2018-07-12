@@ -1,5 +1,5 @@
 const { createApp, createServer } = require('yion');
-const { createSocketServer } = require('yion-mongodb-socket');
+const { createMegaqueryServer } = require('yion-megaquery');
 const pug = require('yion-pug');
 
 const { version, name } = require('./package.json');
@@ -10,20 +10,31 @@ const config = Object.assign({ version, name, env }, parameters.modules);
 
 const app = createApp();
 const httpServer = createServer(app, [pug]);
-const socketServer = createSocketServer(app, httpServer, db);
+const socketServer = createMegaqueryServer(httpServer, app, db);
 const port = process.env.NODE_PORT || 8080;
+const cache = { 'Cache-Control': 'public, max-age=600' };
 
-app.link('/modules', __dirname + '/node_modules');
-app.link('/dist', __dirname + '/dist');
+app.link('/modules', __dirname + '/node_modules', cache);
+app.link('/dist', __dirname + '/dist', cache);
 app.link('/styles', __dirname + '/public/styles');
-app.link('/images', __dirname + '/public/images');
-app.link('/js', __dirname + '/public/js');
+app.link('/images', __dirname + '/public/images', cache);
+app.link('/js', __dirname + '/public/js', cache);
 
-require('./src/controllers/forum')(socketServer);
-require('./modules/social/controller')(socketServer, { messages: { application: 'beaujeuteam'} });
+require('./src/controllers')(socketServer);
+require('pxl-angular-social/src/controller')(socketServer, { application: 'beaujeuteam' });
 
 app.get('/', (req, res) => {
     res.render(__dirname + '/public/views/index.pug', { config });
+});
+
+app.get('/app', (req, res) => {
+    const fs = require('fs');
+    const src = fs.createReadStream(__dirname + '/dist/app.js');
+
+    res.set('Content-Type', 'application/javascript');
+    res.set('Cache-Control', 'public, max-age=600');
+
+    src.pipe(res.original);
 });
 
 httpServer.listen(port);

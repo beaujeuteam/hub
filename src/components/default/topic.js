@@ -1,44 +1,29 @@
-import { core, Component } from 'angular-js-proxy';
+import { Component, router } from 'angular-js-proxy';
 
-import { Repository, CommonUtils } from './../../../modules/common';
+import { Repository, CommonUtils } from 'pxl-angular-common';
+import { Auth } from 'pxl-angular-auth';
 
 @Component({
-    styles: ['.topic-content { font-size: 1.2em; line-height: 32px; }'],
     template: `
-        <header *ngIf="!!topic" class="text-center bg-light p-4">
+        <header *ngIf="!!topic" class="text-center bg-success text-white p-4">
             <h2>{{ topic.title }}</h2>
+            <i *ngIf="topic.metadata.blocked" title="Topic fermé" class="fa fa-lock"></i>
+            <i *ngIf="topic.metadata.pinned" title="Topic épinglé" class="fa fa-thumb-tack"></i>
         </header>
 
         <section class="container">
             <section *ngIf="!!topic">
-                <aside class="media">
-                    <auth-user-avatar-component [username]="topic.user" class="mr-3"></auth-user-avatar-component>
-                    <div class="media-body">
-                        <auth-user-label-component [username]="topic.user"></auth-user-label-component>
-                        <aside class="d-block">
-                            <small>{{ topic.created_at | date }}</small>
-                            <small *ngIf="!!topic.edited_at" class="text-muted">- Edité le {{ topic.edited_at | date }}</small>
-                        </aside>
-                    </div>
+                <social-message-card-component
+                    [id]="topic._id"
+                    [extended]="true"
+                    [urls]="urls"
+                    [actions]="actions"
+                    [displayFooter]="false"
+                    [className]="'topic-content'"
+                >
+                </social-message-card-component>
 
-                    <social-actions-button-component
-                        class="pull-right"
-                        [side]="'right'"
-                        [id]="topic._id"
-                        [urls]="urls">
-                    </social-actions-button-component>
-                </aside>
-
-                <div class="mt-4">
-                    <social-text-decoration-component
-                        class="topic-content"
-                        [text]="topic.content"
-                        [extended]="true"
-                        [markdown]="true">
-                    </social-text-decoration-component>
-                </div>
-
-                <aside class="d-block mt-4">
+                <aside class="d-block">
                     <i class="fa fa-tag"></i>
                     <category-label-component class="mr-2 ml-2" [id]="topic.target.id"></category-label-component>
                     <span class="badge badge-primary mr-2"
@@ -51,31 +36,19 @@ import { Repository, CommonUtils } from './../../../modules/common';
                 <article *ngFor="let reply of replies">
                     <hr>
 
-                    <div class="media">
-                        <auth-user-avatar-component [username]="reply.user" class="mr-3"></auth-user-avatar-component>
-                        <div class="media-body">
-                            <social-actions-button-component
-                                class="pull-right"
-                                [side]="'right'"
-                                [id]="reply._id"
-                                [urls]="replyUrls">
-                            </social-actions-button-component>
-
-                            <auth-user-label-component [username]="reply.user"></auth-user-label-component>
-                            <small class="d-block">{{ reply.created_at | date }}</small>
-
-                            <div class="mt-4">
-                                <social-text-decoration-component
-                                    [text]="reply.content"
-                                    [markdown]="true">
-                                </social-text-decoration-component>
-                            </div>
-                        </div>
-                    </div>
+                    <social-message-card-component
+                        [id]="reply._id"
+                        [displayFooter]="false"
+                        [className]="'topic-reply'"
+                    >
+                    </social-message-card-component>
                 </article>
 
                 <hr>
-                <div class="mt-4">
+
+                <p *ngIf="topic.metadata.blocked" class="alert alert-info">Le topic a été fermé.</p>
+
+                <div *ngIf="!topic.metadata.blocked" class="mt-4">
                     <form (submit)="onSubmit($event)">
                         <social-markdown-editor-component
                             (onChange)="onEditorChange($event)"
@@ -91,13 +64,14 @@ import { Repository, CommonUtils } from './../../../modules/common';
             </section>
         </section>
     `,
-    providers: [Repository, CommonUtils]
+    inject: [Repository, CommonUtils, Auth, router.ActivatedRoute]
 })
 export class TopicComponent {
-    constructor(repository, utils, ActivatedRoute) {
+    constructor(repository, utils, auth, route) {
         this.repository = repository;
         this.utils = utils;
-        this.route = ActivatedRoute;
+        this.auth = auth;
+        this.route = route;
 
         this.topic = null;
         this.sub = null;
@@ -112,24 +86,42 @@ export class TopicComponent {
             target: { type: 'topic', id: null }
         };
         this.urls = null;
+        this.actions = [];
         this.replyUrls = null;
+        this.queryId = null;
     }
 
     ngOnInit() {
         this.sub = this.route.params.subscribe(params => {
             if (!!params.id) {
                 this.reply.target = { type: 'topic', id: params.id };
-                this.repository.query('find-message', { id: params.id }, query => {
+                this.repository.query('messages:get', { id: params.id }, query => {
                     this.topic = query.result;
                     this.urls = {
-                        edit: `/forum/topic/${this.topic._id}/${this.utils.stringToURL(this.topic.title)}`,
-                        delete: `/forum`
+                        edit: { refresh: true },
+                        delete: { url: `/forum` }
                     };
 
-                    this.replyUrls = { edit: this.urls.edit, delete: this.urls.edit };
+                    if (this.auth.token.isGranted('beaujeuteam:topics:pin')) {
+                        this.actions.push({
+                            name: this.topic.metadata.pinned ? 'Désépingler' : 'Epingler',
+                            callback: () => this.pinTopic(),
+                            className: 'text-warning',
+                            refresh: true
+                        });
+                    }
+
+                    if (this.auth.token.isGranted('beaujeuteam:topics:block')) {
+                        this.actions.push({
+                            name: this.topic.metadata.blocked ? 'Ouvrir' : 'Fermer',
+                            callback: () => this.blockTopic(),
+                            className: 'text-warning',
+                            refresh: true
+                        });
+                    }
                 });
 
-                this.repository.query('find-messages', { target: { type: 'topic', id: params.id } }, query => {
+                this.queryId = this.repository.subscribe('messages:find', { target: { type: 'topic', id: params.id } }, query => {
                     this.replies = query.result;
                 });
             }
@@ -138,7 +130,7 @@ export class TopicComponent {
 
     ngOnDestroy() {
         this.sub.unsubscribe();
-        this.repository.clear();
+        this.repository.unsubscribe(this.queryId);
     }
 
     onEditorChange(event) {
@@ -155,11 +147,19 @@ export class TopicComponent {
         }
 
         this.loading = true;
-        this.repository.query('insert-message', this.reply, query => {
+        this.repository.query('messages:insert', this.reply, query => {
             const message = query.result.ops[0];
             this.loading = false;
             this.reset++;
         });
+    }
+
+    pinTopic() {
+        this.repository.query('forum:topics:pin', { id: this.topic._id });
+    }
+
+    blockTopic() {
+        this.repository.query('forum:topics:block', { id: this.topic._id });
     }
 
     isValidate() {

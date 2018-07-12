@@ -1,6 +1,6 @@
 import { Component } from 'angular-js-proxy';
 
-import { Repository } from './../../../modules/common';
+import { Repository } from 'pxl-angular-common';
 
 @Component({
     selector: 'topic-comments-counter-component',
@@ -15,16 +15,17 @@ export class TopicCommentsCounterComponent {
         this.repository = repository;
 
         this.count = 0;
+        this.queryId = null;
     }
 
     ngOnInit() {
         const params = { target: { type: 'topic', id: String(this.id) } };
-        this.repository.query('count-messages', params, (query) => {
+        this.queryId = this.repository.subscribe('messages:count', params, (query) => {
             this.count = query.result;
         });
     }
 
     ngOnDestroy() {
-        this.repository.clear();
+        this.repository.unsubscribe(this.queryId);
     }
 }

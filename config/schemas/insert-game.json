@@ -1,0 +1,21 @@
+{
+    "name": {
+        "_type": "string",
+        "_required": true
+    },
+
+    "gameId": {
+        "_type": "number",
+        "_required": true
+    },
+
+    "imageId": {
+        "_type": "string",
+        "_optional": true
+    },
+
+    "released_at": {
+        "_type": "number",
+        "_default": null
+    }
+}

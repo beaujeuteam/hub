@@ -1,0 +1,11 @@
+{
+    "search": {
+        "_type": "string",
+        "_required": true
+    },
+
+    "limit": {
+        "_type": "number",
+        "_default": 50
+    }
+}

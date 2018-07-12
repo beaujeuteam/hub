@@ -1,0 +1,6 @@
+{
+    "id": {
+        "_type": "string",
+        "_required": true
+    }
+}

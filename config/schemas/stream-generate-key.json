@@ -1,0 +1,6 @@
+{
+    "user": {
+        "_type": "string",
+        "_required": true
+    }
+}

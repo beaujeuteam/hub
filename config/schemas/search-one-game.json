@@ -1,0 +1,6 @@
+{
+    "gameId": {
+        "_type": "number",
+        "_required": true
+    }
+}

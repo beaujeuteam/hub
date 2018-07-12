@@ -4,6 +4,9 @@ import { ProfileComponent } from './profile';
 import { ForumComponent } from './forum';
 import { TopicComponent } from './topic';
 import { WriteTopicComponent } from './write-topic';
+import { CommunityComponent } from './community';
+import { StreamComponent } from './stream';
+import { GameComponent } from './game';
 
 export default [
     HomeComponent,
@@ -11,5 +14,8 @@ export default [
     ProfileComponent,
     ForumComponent,
     TopicComponent,
-    WriteTopicComponent
+    WriteTopicComponent,
+    CommunityComponent,
+    StreamComponent,
+    GameComponent
 ];

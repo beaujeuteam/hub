@@ -1,0 +1,31 @@
+{
+    "key": {
+        "_type": "string",
+        "_required": true
+    },
+
+    "streamId": {
+        "_type": "string",
+        "_required": true
+    },
+
+    "width": {
+        "_type": "number",
+        "_required": true
+    },
+
+    "height": {
+        "_type": "number",
+        "_required": true
+    },
+
+    "fps": {
+        "_type": "number",
+        "_required": true
+    },
+
+    "viewers": {
+        "_type": "number",
+        "_default": 0
+    }
+}

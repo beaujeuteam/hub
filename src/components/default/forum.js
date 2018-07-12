@@ -1,7 +1,8 @@
-import { Component } from 'angular-js-proxy';
+import { Component, router } from 'angular-js-proxy';
 
-import { Repository } from './../../../modules/common';
-import { CommonUtils } from './../../../modules/common';
+import { Repository, CommonUtils } from 'pxl-angular-common';
+
+// inspiration https://discuss.flarum.org/
 
 @Component({
     styles: [
@@ -10,7 +11,11 @@ import { CommonUtils } from './../../../modules/common';
         '.topic-item-link { color: inherit; text-decoration: none; outline : none; }'
     ],
     template: `
-        <header *ngIf="category" class="text-center bg-light p-4">
+        <header *ngIf="!category" class="text-center bg-success text-white p-4">
+            <h2>Forum</h2>
+        </header>
+
+        <header *ngIf="category" class="text-center bg-success text-white p-4">
             <h2>{{ category.name }}</h2>
             <p>{{ category.description }}</p>
         </header>
@@ -32,7 +37,7 @@ import { CommonUtils } from './../../../modules/common';
                             [routerLink]="['/forum/category', category._id, utils.stringToURL(category.name)]"
                             class="d-block m-2 text-dark"
                         >
-                            <i class="fa fa-square"></i> {{ category.name }}
+                            <i class="fa" [class.fa-square]="!category.parent" [class.fa-square-o]="category.parent"></i> {{ category.name }}
                         </a>
                     </div>
                 </div>
@@ -92,19 +97,24 @@ import { CommonUtils } from './../../../modules/common';
                                         </topic-comments-counter-component>
                                     </aside>
 
-                                    <h5 class="m-0">{{ topic.title }}</h5>
+                                    <h5 class="m-0">
+                                        <small>
+                                            <i *ngIf="topic.metadata.blocked" title="Topic fermé" class="fa fa-lock"></i>
+                                            <i *ngIf="topic.metadata.pinned" title="Topic épinglé" class="fa fa-thumb-tack"></i>
+                                        </small>
+                                        {{ topic.title }}
+                                    </h5>
                                     <small>{{ topic.created_at | date }}</small>
+
                                 </div>
                             </article>
                         </a>
-
-                        <common-article-loading-component *ngIf="loading"></common-article-loading-component>
                     </div>
                 </div>
             </div>
         </section>
     `,
-    providers: [Repository, CommonUtils]
+    inject: [Repository, CommonUtils, router.ActivatedRoute]
 })
 export class ForumComponent {
     constructor(repository, utils, ActivatedRoute) {
@@ -117,7 +127,7 @@ export class ForumComponent {
         this.subcategories = [];
         this.topics = [];
         this.sub = null;
-        this.loading = true;
+        this.queryId = null;
     }
 
     ngOnInit() {
@@ -129,37 +139,36 @@ export class ForumComponent {
                 categoriesParams = { parent: params.id };
                 topicsParams = { target: { type: 'category', id: params.id }, type: 'topic' };
 
-                this.repository.query('find-category', { id: params.id }, query => {
+                this.repository.query('forum:categories:get', { id: params.id }, query => {
                     this.category = query.result;
                 });
             }
 
-            this.repository.query('find-categories', categoriesParams, query => {
+            this.repository.query('forum:categories:find', categoriesParams, query => {
                 this.subcategories = query.result;
             });
 
             if (this.sort === 'newest') {
-                topicsParams.sort = { created_at: -1, edited_at: -1 };
+                topicsParams.sort = { 'metadata.pinned': -1, created_at: -1, edited_at: -1 };
             }
 
             if (this.sort === 'latest') {
-                topicsParams.sort = { edited_at: -1, created_at: -1 };
+                topicsParams.sort = { 'metadata.pinned': -1, edited_at: -1, created_at: -1 };
             }
 
             if (this.sort === 'oldest') {
-                topicsParams.sort = { edited_at: 1, created_at: 1 };
+                topicsParams.sort = { 'metadata.pinned': -1, edited_at: 1, created_at: 1 };
             }
 
-            this.repository.query('find-messages', topicsParams, query => {
+            this.queryId = this.repository.subscribe('messages:find', topicsParams, query => {
                 this.topics = query.result;
-                this.loading = false;
             });
         });
     }
 
     ngOnDestroy() {
         this.sub.unsubscribe();
-        this.repository.clear();
+        this.repository.unsubscribe(this.queryId);
     }
 
     onChange() {

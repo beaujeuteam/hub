@@ -1,0 +1,11 @@
+{
+    "id": {
+        "_type": "string",
+        "_optional": true
+    },
+
+    "gameId": {
+        "_type": "number",
+        "_optional": true
+    }
+}
