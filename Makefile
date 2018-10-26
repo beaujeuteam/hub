@@ -10,7 +10,7 @@ build: $(DIST_DIR) node_modules $(CONFIG_DIR)/config.json
 	$(BIN_DIR)/browserify src/app.js -t [ babelify ] | $(BIN_DIR)/uglifyjs --keep-fnames -c -o $(BIN_FILE)
 
 clean:
-	rm -rf ./node_modules
+	rm -rf ./node_modules  && rm -rf $(DIST_DIR)
 
 doc: node_modules
 	${BIN_DIR}/esdoc

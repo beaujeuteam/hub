@@ -1,5 +1,3 @@
-import { Component, router } from 'angular-js-proxy';
-
 import { Repository, CommonUtils } from 'pxl-angular-common';
 import { Auth } from 'pxl-angular-auth';
 
@@ -14,7 +12,7 @@ import { Auth } from 'pxl-angular-auth';
         <section class="container">
             <section *ngIf="!!topic">
                 <social-message-card-component
-                    [id]="topic._id"
+                    [message]="topic"
                     [extended]="true"
                     [urls]="urls"
                     [actions]="actions"
@@ -37,7 +35,7 @@ import { Auth } from 'pxl-angular-auth';
                     <hr>
 
                     <social-message-card-component
-                        [id]="reply._id"
+                        [message]="reply"
                         [displayFooter]="false"
                         [className]="'topic-reply'"
                     >
@@ -64,7 +62,7 @@ import { Auth } from 'pxl-angular-auth';
             </section>
         </section>
     `,
-    inject: [Repository, CommonUtils, Auth, router.ActivatedRoute]
+    inject: [Repository, CommonUtils, Auth, ng.router.ActivatedRoute]
 })
 export class TopicComponent {
     constructor(repository, utils, auth, route) {
@@ -85,43 +83,23 @@ export class TopicComponent {
             mimetype: 'markdown',
             target: { type: 'topic', id: null }
         };
-        this.urls = null;
+        this.urls = { delete: { url: `/forum` } };
         this.actions = [];
         this.replyUrls = null;
-        this.queryId = null;
+        this.queryIds = [null, null];
     }
 
     ngOnInit() {
         this.sub = this.route.params.subscribe(params => {
             if (!!params.id) {
                 this.reply.target = { type: 'topic', id: params.id };
-                this.repository.query('messages:get', { id: params.id }, query => {
+                this.queryIds[0] = this.repository.subscribe('messages:get', { id: params.id, unique: true }, query => {
                     this.topic = query.result;
-                    this.urls = {
-                        edit: { refresh: true },
-                        delete: { url: `/forum` }
-                    };
 
-                    if (this.auth.token.isGranted('beaujeuteam:topics:pin')) {
-                        this.actions.push({
-                            name: this.topic.metadata.pinned ? 'Désépingler' : 'Epingler',
-                            callback: () => this.pinTopic(),
-                            className: 'text-warning',
-                            refresh: true
-                        });
-                    }
-
-                    if (this.auth.token.isGranted('beaujeuteam:topics:block')) {
-                        this.actions.push({
-                            name: this.topic.metadata.blocked ? 'Ouvrir' : 'Fermer',
-                            callback: () => this.blockTopic(),
-                            className: 'text-warning',
-                            refresh: true
-                        });
-                    }
+                    this.initActions();
                 });
 
-                this.queryId = this.repository.subscribe('messages:find', { target: { type: 'topic', id: params.id } }, query => {
+                this.queryIds[1] = this.repository.subscribe('messages:find', { target: { type: 'topic', id: params.id } }, query => {
                     this.replies = query.result;
                 });
             }
@@ -130,7 +108,27 @@ export class TopicComponent {
 
     ngOnDestroy() {
         this.sub.unsubscribe();
-        this.repository.unsubscribe(this.queryId);
+        this.repository.unsubscribe(this.queryIds[0]);
+        this.repository.unsubscribe(this.queryIds[1]);
+    }
+
+    initActions() {
+        this.actions = [];
+        if (this.auth.token.isGranted('beaujeuteam:topics:pin')) {
+            this.actions.push({
+                name: this.topic.metadata.pinned ? 'Désépingler' : 'Epingler',
+                callback: () => this.pinTopic(),
+                className: 'text-warning'
+            });
+        }
+
+        if (this.auth.token.isGranted('beaujeuteam:topics:block')) {
+            this.actions.push({
+                name: this.topic.metadata.blocked ? 'Ouvrir' : 'Fermer',
+                callback: () => this.blockTopic(),
+                className: 'text-warning'
+            });
+        }
     }
 
     onEditorChange(event) {

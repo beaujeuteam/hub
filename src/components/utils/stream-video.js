@@ -1,5 +1,4 @@
-import { Component, core } from 'angular-js-proxy';
-
+import boxstore from 'boxstore';
 import flvjs from 'flv.js';
 
 @Component({
@@ -8,7 +7,7 @@ import flvjs from 'flv.js';
     template: `
         <video></video>
     `,
-    providers: [core.ElementRef]
+    inject: [ng.core.ElementRef]
 })
 export class StreamVideoComponent {
     constructor(ElementRef) {
@@ -42,7 +41,7 @@ export class StreamVideoComponent {
 
         this.player = flvjs.createPlayer({
             type: 'flv',
-            url: `ws://92.222.88.16:8981/live/${this.id}.flv`
+            url: `${boxstore.get('stream.url')}:8981/live/${this.id}.flv`
         });
     }
 

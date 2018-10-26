@@ -1,11 +1,9 @@
-import { core, router, platformBrowserDynamic, platformBrowser, forms, common } from 'angular-js-proxy';
-import { Component, NgModule } from 'angular-js-proxy';
 import localeFr from './../config/locale';
 
-common.registerLocaleData(localeFr);
+ng.common.registerLocaleData(localeFr);
 
-const { enableProdMode, LOCALE_ID } = core;
-const { RouterModule } = router;
+const { enableProdMode, LOCALE_ID } = ng.core;
+const { RouterModule } = ng.router;
 
 import boxstore from 'boxstore';
 boxstore.set(CONFIG, { immutable: true });
@@ -103,8 +101,8 @@ class AppComponent {
         CommonModule,
         AuthModule,
         SocialModule,
-        forms.FormsModule,
-        platformBrowser.BrowserModule,
+        ng.forms.FormsModule,
+        ng.platformBrowser.BrowserModule,
         routing
     ],
     providers: [
@@ -122,4 +120,4 @@ if ('production' === CONFIG.env) {
     enableProdMode();
 }
 
-platformBrowserDynamic.platformBrowserDynamic().bootstrapModule(AppModule);
+ng.platformBrowserDynamic.platformBrowserDynamic().bootstrapModule(AppModule);

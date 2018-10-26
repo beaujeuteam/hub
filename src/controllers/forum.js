@@ -33,8 +33,6 @@ class ForumController {
             params: { type: 'topic', id: data.id }
         }).then(({ result }) => {
             if (result) {
-                console.log('PINNNNN', result);
-
                 return server.query({
                     type: 'update',
                     collection: 'messages',

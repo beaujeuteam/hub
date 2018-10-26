@@ -1,4 +1,4 @@
-import { Component } from 'angular-js-proxy';
+import { StreamsRepository } from './../../services/streams';
 
 import { Repository } from 'pxl-angular-common';
 import { Auth } from 'pxl-angular-auth';
@@ -19,6 +19,14 @@ import { Auth } from 'pxl-angular-auth';
                     <a class="nav-link" data-toggle="pill" href="#stream">Stream</a>
                 </li>
             </ul>
+
+            <p *ngIf="okMessage" class="alert alert-success">
+                {{ okMessage }}
+                <button type="button" class="close" (click)="okMessage = null">
+                    <span>&times;</span>
+                </button>
+            </p>
+
             <div class="tab-content" id="pills-tabContent">
 
                 <!-- GENERAL DIV -->
@@ -138,12 +146,13 @@ import { Auth } from 'pxl-angular-auth';
             </div>
         </section>
     `,
-    inject: [Repository, Auth]
+    inject: [Repository, Auth, StreamsRepository]
 })
 export class ProfileComponent {
-    constructor(repository, auth) {
+    constructor(repository, auth, streams) {
         this.repository = repository;
         this.auth = auth;
+        this.streams = streams;
 
         this.key = null;
         this.loading = false;
@@ -154,12 +163,13 @@ export class ProfileComponent {
             title: null,
             poster: null
         };
-        this.queryId = null;
+        this.queryIds = [null, null];
+        this.okMessage = null;
     }
 
     ngOnInit() {
         const user = this.auth.getUser();
-        this.repository.query('streams:get', { user: user.username }, (query) => {
+        this.queryIds[0] = this.streams.subscribe('streams:get', { user: user.username }, (query) => {
             if (!!query.result) {
                 this.key = query.result.key;
                 this.streamData.title = query.result.title;
@@ -167,19 +177,20 @@ export class ProfileComponent {
             }
         });
 
-        this.queryId = this.repository.subscribe('users:games:find', {}, (query) => {
+        this.queryIds[1] = this.repository.subscribe('users:games:find', {}, (query) => {
             this.games = query.result;
         });
     }
 
     ngOnDestroy() {
-        this.repository.unsubscribe(this.queryId);
+        this.repository.unsubscribe(this.queryIds[0]);
+        this.repository.unsubscribe(this.queryIds[1]);
     }
 
     generateKey() {
         const user = this.auth.getUser();
         this.loading = true;
-        this.repository.query('streams:key:generate', { user: user.username }, (query) => {
+        this.streams.query('streams:key:generate', { user: user.username }, (query) => {
             this.loading = false;
         });
     }
@@ -220,6 +231,7 @@ export class ProfileComponent {
 
     onStreamSubmit(event) {
         event.preventDefault();
+        this.okMessage = null;
 
         const form = event.target;
         const data = {
@@ -228,8 +240,9 @@ export class ProfileComponent {
             poster: this.streamData.poster
         };
 
-        this.repository.query('streams:update', data, (query) => {
+        this.streams.query('streams:update', data, (query) => {
             this.loading = false;
+            this.okMessage = 'Information sauvegardée ;)';
         });
     }
 }

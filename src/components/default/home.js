@@ -1,4 +1,3 @@
-import { Component } from 'angular-js-proxy';
 
 @Component({
     template: `

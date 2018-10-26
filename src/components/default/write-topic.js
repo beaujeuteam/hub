@@ -1,5 +1,3 @@
-import { Component, router } from 'angular-js-proxy';
-
 import { Repository, CommonUtils } from 'pxl-angular-common';
 
 @Component({
@@ -28,7 +26,7 @@ import { Repository, CommonUtils } from 'pxl-angular-common';
             </section>
         </section>
     `,
-    inject: [Repository, CommonUtils, router.ActivatedRoute, router.Router]
+    inject: [Repository, CommonUtils, ng.router.ActivatedRoute, ng.router.Router]
 })
 export class WriteTopicComponent {
     constructor(repository, utils, ActivatedRoute, Router) {

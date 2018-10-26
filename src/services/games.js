@@ -1,4 +1,3 @@
-import { Injectable } from 'angular-js-proxy';
 
 @Injectable()
 export class GamesRepository {

@@ -1,4 +1,4 @@
-import { Component, router } from 'angular-js-proxy';
+import { StreamsRepository } from './../../services/streams';
 
 import { Repository, CommonUtils } from 'pxl-angular-common';
 
@@ -46,11 +46,11 @@ import { Repository, CommonUtils } from 'pxl-angular-common';
                             <i class="fa fa-wifi"></i> Streams
                         </a>
 
-                        <a [routerLink]="['/community/videos']"
+                        <!--<a [routerLink]="['/community/videos']"
                             class="d-block m-2 text-dark"
                         >
                             <i class="fa fa-video-camera"></i> Vidéos
-                        </a>
+                        </a>-->
 
                         <a [routerLink]="['/community/games']"
                             class="d-block m-2 text-dark"
@@ -76,7 +76,7 @@ import { Repository, CommonUtils } from 'pxl-angular-common';
                         <social-write-message-component [parameters]="messageParameters"></social-write-message-component>
 
                         <div class="mb-4 mt-4">
-                            <p *ngIf="messages.length == 0 && !loading" class="alert alert-info col-md-12">
+                            <p *ngIf="messages.length === 0" class="alert alert-info col-md-12">
                                 Aucun message pour le moment :'(
                             </p>
 
@@ -91,18 +91,49 @@ import { Repository, CommonUtils } from 'pxl-angular-common';
                     <!-- STREAM DIV -->
 
                     <div *ngIf="type && type == 'streams'">
-                        <p *ngIf="streams.length == 0 && !loading" class="alert alert-info col-md-12">
+                        <h3>En direct</h3>
+
+                        <p *ngIf="getStreams().length === 0" class="alert alert-info col-md-12">
                             Aucun stream pour le moment :'(
                         </p>
 
-                        <div *ngFor="let stream of streams" class="col-md-6">
+                        <div *ngFor="let aliveStream of getStreams()" class="col-md-6">
                             <article class="card">
                                 <stream-video-component
                                     class="card-img-top"
                                     [auto]="true"
-                                    [poster]="stream.poster"
-                                    [id]="stream.key">
+                                    [poster]="aliveStream.poster"
+                                    [id]="aliveStream.key">
                                 </stream-video-component>
+
+                                <div class="card-body">
+                                    <header class="media">
+                                        <auth-user-avatar-component class="mr-2"
+                                            [username]="aliveStream.user">
+                                        </auth-user-avatar-component>
+
+                                        <div class="media-body">
+                                            <span class="pull-right">
+                                                <i class="fa fa-eye"></i> {{ aliveStream.viewers }}
+                                            </span>
+                                            <auth-user-label-component [username]="aliveStream.user"></auth-user-label-component>
+                                            <a [routerLink]="['/stream', aliveStream.user]" class="media-link">
+                                                <h5>{{ aliveStream.title }}</h5>
+                                            </a>
+                                        </div>
+                                    </header>
+                                </div>
+                            </article>
+                        </div>
+
+                        <h3 *ngIf="getStreams(false).length > 0">Tous les streams</h3>
+                        <div *ngFor="let stream of getStreams(false)" class="col-md-6">
+                            <article *ngIf="stream.poster" class="card">
+                                <common-image-loader-component
+                                    [url]="stream.poster"
+                                    [title]="stream.title"
+                                    [className]="'card-img-top'">
+                                </common-image-loader-component>
 
                                 <div class="card-body">
                                     <header class="media">
@@ -111,9 +142,6 @@ import { Repository, CommonUtils } from 'pxl-angular-common';
                                         </auth-user-avatar-component>
 
                                         <div class="media-body">
-                                            <span class="pull-right">
-                                                <i class="fa fa-eye"></i> {{ stream.viewers + 1 }}
-                                            </span>
                                             <auth-user-label-component [username]="stream.user"></auth-user-label-component>
                                             <a [routerLink]="['/stream', stream.user]" class="media-link">
                                                 <h5>{{ stream.title }}</h5>
@@ -128,7 +156,7 @@ import { Repository, CommonUtils } from 'pxl-angular-common';
                     <!-- VIDEOS DIV -->
 
                     <div *ngIf="type && type == 'videos'">
-                        <p *ngIf="videos.length == 0 && !loading" class="alert alert-info col-md-12">
+                        <p *ngIf="videos.length == 0" class="alert alert-info col-md-12">
                             Aucune vidéo pour le moment :'(
                         </p>
 
@@ -162,12 +190,13 @@ import { Repository, CommonUtils } from 'pxl-angular-common';
             </div>
         </section>
     `,
-    inject: [Repository, CommonUtils, router.ActivatedRoute]
+    inject: [Repository, CommonUtils, StreamsRepository, ng.router.ActivatedRoute]
 })
 export class CommunityComponent {
-    constructor(repository, utils, ActivatedRoute) {
+    constructor(repository, utils, streams, ActivatedRoute) {
         this.repository = repository;
         this.utils = utils;
+        this.streamsRepository = streams;
         this.route = ActivatedRoute;
 
         this.streams = [];
@@ -182,11 +211,12 @@ export class CommunityComponent {
     }
 
     ngOnInit() {
+        this.destroyRepositoryListerners();
         this.sub = this.route.params.subscribe((params) => {
             this.type = 'home';
 
             if (!!params['type'] && params['type'] === 'streams') {
-                this.queryIds[0] = this.repository.subscribe('streams:find', {}, (query) => {
+                this.queryIds[0] = this.streamsRepository.subscribe('streams:find', {}, (query) => {
                     this.streams = query.result;
                 });
 
@@ -213,9 +243,17 @@ export class CommunityComponent {
         });
     }
 
+    getStreams(alive = true) {
+        return this.streams.filter(s => s.alive === alive);
+    }
+
     ngOnDestroy() {
         this.sub.unsubscribe();
-        this.repository.unsubscribe(this.queryIds[0]);
+        this.destroyRepositoryListerners();
+    }
+
+    destroyRepositoryListerners() {
+        this.streamsRepository.unsubscribe(this.queryIds[0]);
         this.repository.unsubscribe(this.queryIds[1]);
         this.repository.unsubscribe(this.queryIds[2]);
     }

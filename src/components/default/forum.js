@@ -1,5 +1,3 @@
-import { Component, router } from 'angular-js-proxy';
-
 import { Repository, CommonUtils } from 'pxl-angular-common';
 
 // inspiration https://discuss.flarum.org/
@@ -114,7 +112,7 @@ import { Repository, CommonUtils } from 'pxl-angular-common';
             </div>
         </section>
     `,
-    inject: [Repository, CommonUtils, router.ActivatedRoute]
+    inject: [Repository, CommonUtils, ng.router.ActivatedRoute]
 })
 export class ForumComponent {
     constructor(repository, utils, ActivatedRoute) {

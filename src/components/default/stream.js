@@ -1,8 +1,11 @@
-import { Component, router } from 'angular-js-proxy';
-
 import { Repository } from 'pxl-angular-common';
 
+import { StreamsRepository } from './../../services/streams';
+
 @Component({
+    styles: [
+        '.comments-container { margin: 10px; padding: 0; list-style: none; }'
+    ],
     template: `
         <section class="container">
             <div class="row">
@@ -15,31 +18,46 @@ import { Repository } from 'pxl-angular-common';
                         </div>
                     </header>
 
-                    <stream-video-component
-                        [auto]="true"
-                        [poster]="stream.poster"
-                        [id]="stream.key">
-                    </stream-video-component>
+                    <div class="container-fluid">
+                        <stream-video-component
+                            [auto]="true"
+                            [poster]="stream.poster"
+                            [id]="stream.key">
+                        </stream-video-component>
+                    </div>
 
                     <aside *ngIf="stream.alive" class="text-right">
-                        <i class="fa fa-eye"></i> {{ stream.viewers + 1 }}
+                        <stream-viewers-counter-component
+                            [streamId]="stream.streamId">
+                        </stream-viewers-counter-component>
                     </aside>
                 </div>
 
-                <div class="col-md-4">
+                <div *ngIf="target" class="col-md-4">
                     <h3>Tchat</h3>
+                    <ul class="comments-container">
+                        <li *ngFor="let comment of comments">
+                            <strong>{{ comment.user }}</strong>: {{ comment.content }}
+                        </li>
+                    </ul>
+
+                    <social-message-reply-component
+                        [target]="target">
+                    </social-message-reply-component>
                 </div>
             </div>
         </section>
     `,
-    inject: [Repository, router.ActivatedRoute]
+    inject: [Repository, StreamsRepository, ng.router.ActivatedRoute]
 })
 export class StreamComponent {
-    constructor(repository, ActivatedRoute) {
+    constructor(repository, streamsRepository, ActivatedRoute) {
         this.repository = repository;
+        this.streamsRepository = streamsRepository;
         this.route = ActivatedRoute;
 
         this.stream = null;
+        this.target = null;
         this.comments = [];
         this.queryId = null;
     }
@@ -47,11 +65,12 @@ export class StreamComponent {
     ngOnInit() {
         this.sub = this.route.params.subscribe((params) => {
             if (!!params['username']) {
-                this.repository.query('streams:get', { user: params['username'] }, (query) => {
+                this.streamsRepository.query('streams:get', { user: params['username'] }, (query) => {
                     this.stream = query.result;
+                    this.target = { type: 'stream', id: this.stream._id };
 
-                    const params = { target: { type: 'stream', id: this.stream._id } };
-                    this.queryId = this.repository.query('messags:find', {}, (query) => {
+                    const params = { target: this.target, sort: { created_at: 1 }}
+                    this.queryId = this.repository.subscribe('messages:find', params, (query) => {
                         this.comments = query.result;
                     });
                 });

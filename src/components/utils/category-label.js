@@ -1,5 +1,3 @@
-import { Component } from 'angular-js-proxy';
-
 import { Repository, CommonUtils } from 'pxl-angular-common';
 
 @Component({

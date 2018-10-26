@@ -12,7 +12,19 @@ const app = createApp();
 const httpServer = createServer(app, [pug]);
 const socketServer = createMegaqueryServer(httpServer, app, db);
 const port = process.env.NODE_PORT || 8080;
-const cache = { 'Cache-Control': 'public, max-age=600' };
+const cache = {
+    'Cache-Control': 'public, max-age=' + (86400 * 30),
+    'ETag': Date.now()
+};
+
+// validate cache
+app.use((req, res, next) => {
+    if (req.headers['if-none-match'] && req.headers['if-none-match'] == cache['ETag']) {
+        return res.status(304).send();
+    }
+
+    next();
+});
 
 app.link('/modules', __dirname + '/node_modules', cache);
 app.link('/dist', __dirname + '/dist', cache);
@@ -32,7 +44,8 @@ app.get('/app', (req, res) => {
     const src = fs.createReadStream(__dirname + '/dist/app.js');
 
     res.set('Content-Type', 'application/javascript');
-    res.set('Cache-Control', 'public, max-age=600');
+    res.set('Cache-Control', cache['Cache-Control']);
+    res.set('ETag', cache['ETag']);
 
     src.pipe(res.original);
 });

@@ -1,5 +1,3 @@
-import { Component } from 'angular-js-proxy';
-
 import { Auth } from 'pxl-angular-auth';
 
 @Component({

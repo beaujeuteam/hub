@@ -23,6 +23,10 @@
                     "update": "https://auth.com/update"
                 },
                 "scopes": []
+            },
+            "stream": {
+                "url": "ws://localhost",
+                "port": 8081
             }
         }
     },
@@ -51,6 +55,10 @@
                     "update": "https://auth.com/update"
                 },
                 "scopes": []
+            },
+            "stream": {
+                "url": "ws://92.222.88.16",
+                "port": 8081
             }
         }
     }

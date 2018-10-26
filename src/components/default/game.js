@@ -1,5 +1,3 @@
-import { Component, router } from 'angular-js-proxy';
-
 import { Auth } from 'pxl-angular-auth';
 import { Repository, CommonUtils } from 'pxl-angular-common';
 
@@ -63,9 +61,9 @@ import { Repository, CommonUtils } from 'pxl-angular-common';
                         </div>
                     </div>
 
-                    <h5 class="mt-4">Vidéo(s) de la communauté</h5>
+                    <!--<h5 class="mt-4">Vidéo(s) de la communauté</h5>-->
 
-                    <p class="alert alert-info">Aucune vidéo du jeu, <a href="">ajoute en une ;)</a></p>
+                    <!--<p class="alert alert-info">Aucune vidéo du jeu, <a href="">ajoute en une ;)</a></p>-->
                 </div>
 
                 <div class="col-md-4">
@@ -113,7 +111,7 @@ import { Repository, CommonUtils } from 'pxl-angular-common';
             </div>
         </section>
     `,
-    inject: [Repository, CommonUtils, Auth, router.ActivatedRoute]
+    inject: [Repository, CommonUtils, Auth, ng.router.ActivatedRoute]
 })
 export class GameComponent {
     constructor(repository, utils, auth, ActivatedRoute) {
