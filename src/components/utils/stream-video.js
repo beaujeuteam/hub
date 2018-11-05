@@ -41,7 +41,7 @@ export class StreamVideoComponent {
 
         this.player = flvjs.createPlayer({
             type: 'flv',
-            url: `${boxstore.get('stream.url')}:8981/live/${this.id}.flv`
+            url: `ws://${boxstore.get('stream.ip')}:8981/live/${this.id}.flv`
         });
     }
 

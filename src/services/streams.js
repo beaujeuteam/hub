@@ -8,7 +8,7 @@ export class StreamsRepository {
         this.client = new Client();
         this.repository = new Repository(this.client);
 
-        this.client.connect(`${boxstore.get('stream.url')}:${boxstore.get('stream.port')}`);
+        this.client.connect(boxstore.get('stream.url'));
     }
 
     query(name, params = {}, callback = null) {

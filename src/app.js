@@ -13,12 +13,17 @@ import { ProfileComponent } from './components/default/profile';
 import { ForumComponent } from './components/default/forum';
 import { TopicComponent } from './components/default/topic';
 import { WriteTopicComponent } from './components/default/write-topic';
-import { CommunityComponent } from './components/default/community';
 import { StreamComponent } from './components/default/stream';
 import { GameComponent } from './components/default/game';
+import {
+    CommunityMessagesComponent,
+    CommunityGamesComponent,
+    CommunityStreamsComponent
+} from './components/community';
 
 import defaultComponents from './components/default';
 import utilsComponents from './components/utils';
+import communityComponents from './components/community';
 import services from './services';
 
 import { CommonModule, Client } from 'pxl-angular-common';
@@ -32,8 +37,9 @@ const routing = RouterModule.forRoot([
     { path: 'forum/category/:id/:name', component: ForumComponent, canActivate: [Auth] },
     { path: 'forum/category/:id/:name/new-topic', component: WriteTopicComponent, canActivate: [Auth] },
     { path: 'forum/topic/:id/:name', component: TopicComponent, canActivate: [Auth] },
-    { path: 'community', component: CommunityComponent, canActivate: [Auth] },
-    { path: 'community/:type', component: CommunityComponent, canActivate: [Auth] },
+    { path: 'community', component: CommunityMessagesComponent, canActivate: [Auth] },
+    { path: 'community/games', component: CommunityGamesComponent, canActivate: [Auth] },
+    { path: 'community/streams', component: CommunityStreamsComponent, canActivate: [Auth] },
     { path: 'community/game/:id/:name', component: GameComponent, canActivate: [Auth] },
     { path: 'stream/:username', component: StreamComponent, canActivate: [Auth] }
 ], { useHash: true });
@@ -95,7 +101,8 @@ class AppComponent {
 @NgModule({
     declarations: [AppComponent].concat(
         defaultComponents,
-        utilsComponents
+        utilsComponents,
+        communityComponents
     ),
     imports: [
         CommonModule,

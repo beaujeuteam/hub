@@ -25,7 +25,7 @@
     "port": 9017,
     "options": "--restart always",
     "env": {
-      "NODE_ENV": "dev"
+      "NODE_ENV": "production"
     }
   },
   "author": "Kevin Balicot <kevinbalicot@gmail.com>",

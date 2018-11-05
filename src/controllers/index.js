@@ -1,23 +1,19 @@
 const ForumController = require('./forum');
 const StreamsController = require('./streams');
 const GamesController = require('./games');
+const Hooker = require('./../services/hooker');
 
 module.exports = (server) => {
 
     const forumCtrl = new ForumController();
     const streamsCtrl = new StreamsController();
     const gamesCtrl = new GamesController();
+    const hooker = new Hooker(server);
 
     server.addValidator('forum:categories:find', require('./../../config/schemas/find-categories.json'));
     server.addValidator('forum:categories:get', require('./../../config/schemas/find-category.json'));
     server.addValidator('forum:topics:pin', require('./../../config/schemas/pin-topic.json'), ['beaujeuteam:topics:pin']);
     server.addValidator('forum:topics:block', require('./../../config/schemas/block-topic.json'), ['beaujeuteam:topics:block']);
-
-    /*server.addValidator('streams:get', require('./../../config/schemas/get-stream.json'));
-    server.addValidator('streams:update', require('./../../config/schemas/update-stream.json'));
-    server.addValidator('streams:play', require('./../../config/schemas/play-stream.json'));
-    server.addValidator('streams:stop', require('./../../config/schemas/stop-stream.json'));
-    server.addValidator('streams:key:generate', require('./../../config/schemas/stream-generate-key.json'));*/
 
     server.addValidator('games:insert', require('./../../config/schemas/insert-game.json'));
     server.addValidator('games:search', require('./../../config/schemas/search-game.json'));
@@ -35,13 +31,6 @@ module.exports = (server) => {
     server.on('forum:topics:pin', (event, server) => forumCtrl.pinTopic(event, server));
     server.on('forum:topics:block', (event, server) => forumCtrl.blockTopic(event, server));
 
-    /*server.on('streams:get', (event, server) => streamsCtrl.get(event, server));
-    server.on('streams:find', (event, server) => streamsCtrl.find(event, server));
-    server.on('streams:update', (event, server) => streamsCtrl.update(event, server));
-    server.on('streams:play', (event, server) => streamsCtrl.play(event, server));
-    server.on('streams:stop', (event, server) => streamsCtrl.stop(event, server));
-    server.on('streams:key:generate', (event, server) => streamsCtrl.generateKey(event, server));*/
-
     server.on('games:insert', (event, server) => gamesCtrl.insert(event, server));
     server.on('games:search', (event, server) => gamesCtrl.search(event, server));
     server.on('games:search-one', (event, server) => gamesCtrl.searchOne(event, server));
@@ -56,10 +45,12 @@ module.exports = (server) => {
 
     server.on('users:games:find', (event, server) => gamesCtrl.findByUser(event, server));
 
+    // HOOK
     server.on('messages:insert', (event, server) => {
-        const { data } = event;
+        const { data, client } = event;
 
         if (!!data.target && data.type === 'topic') {
+            hooker.dispatch('topic:create', Object.assign({ user: client.token.payload.sub }, data));
             server.query({
                 type: 'update',
                 collection: 'messages',
@@ -67,5 +58,16 @@ module.exports = (server) => {
                 params: { $set: { edited_at: new Date() } }
             });
         }
-    })
+    });
+
+    server.on('games:users-to-play:insert', (event, server) => {
+        const { data, client } = event;
+
+        server.query({
+            type: 'findOne',
+            collection: 'beaujeuteam_games',
+            params: { id: data.id }
+        })
+        .then(({ result }) => hooker.dispatch('users:to-play', Object.assign({ user: client.token.payload.sub }, result)));
+    });
 };
