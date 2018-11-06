@@ -15,11 +15,7 @@ import { TopicComponent } from './components/default/topic';
 import { WriteTopicComponent } from './components/default/write-topic';
 import { StreamComponent } from './components/default/stream';
 import { GameComponent } from './components/default/game';
-import {
-    CommunityMessagesComponent,
-    CommunityGamesComponent,
-    CommunityStreamsComponent
-} from './components/community';
+import { CommunityMessagesComponent, CommunityGamesComponent, CommunityStreamsComponent } from './components/community';
 
 import defaultComponents from './components/default';
 import utilsComponents from './components/utils';
@@ -48,6 +44,9 @@ const routing = RouterModule.forRoot([
     selector: 'app-component',
     template: `
         <nav-component></nav-component>
+        <div *ngIf="auth.errorMessage" class="p-3 bg-danger text-white text-center">
+            Vous n'êtes soit pas connecté soit pas autorisé à visiter cette page "{{ auth.errorMessage }}"
+        </div>
         <router-outlet></router-outlet>
         <footer class="footer">
             <span class="pull-left">

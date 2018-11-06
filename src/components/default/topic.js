@@ -9,7 +9,7 @@ import { Auth } from 'pxl-angular-auth';
             <i *ngIf="topic.metadata.pinned" title="Topic épinglé" class="fa fa-thumb-tack"></i>
         </header>
 
-        <section class="container">
+        <section role="main" class="container">
             <section *ngIf="!!topic">
                 <social-message-card-component
                     [message]="topic"

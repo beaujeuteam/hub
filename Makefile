@@ -21,6 +21,9 @@ test: node_modules
 start: build-dev
 	node server.js
 
+changelog: node_modules
+	$(BIN_DIR)/conventional-changelog -p angular -i CHANGELOG.md -s
+
 .PHONY: build-dev build clean doc start
 
 node_modules: package.json

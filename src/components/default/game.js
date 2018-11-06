@@ -7,7 +7,7 @@ import { Repository, CommonUtils } from 'pxl-angular-common';
             <h2>{{ game.name }}</h2>
         </header>
 
-        <section class="container">
+        <section role="main" class="container">
             <div *ngIf="!!game" class="row">
                 <div class="col-md-8">
                     <div class="media mb-4">

@@ -7,7 +7,7 @@ import { StreamsRepository } from './../../services/streams';
         '.comments-container { margin: 10px; padding: 0; list-style: none; }'
     ],
     template: `
-        <section class="container">
+        <section role="main" class="container">
             <div class="row">
                 <div *ngIf="!!stream" class="col-md-8">
                     <header class="media mb-4">

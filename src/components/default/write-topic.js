@@ -7,7 +7,7 @@ import { Repository, CommonUtils } from 'pxl-angular-common';
             <span *ngIf="!!category">{{ category.name }}</span>
         </header>
 
-        <section class="container">
+        <section role="main" class="container">
             <section *ngIf="!!category">
                 <form (submit)="onSubmit($event)">
                     <div class="group-form">

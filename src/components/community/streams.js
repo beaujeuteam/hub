@@ -10,7 +10,7 @@ import { Repository } from 'pxl-angular-common';
             <p>Les derniers streams en cours</p>
         </header>
 
-        <section class="container">
+        <section role="main" class="container">
             <div class="row">
                 <div class="col-md-2">
                     <div class="mb-4">

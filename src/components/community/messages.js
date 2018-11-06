@@ -6,7 +6,7 @@ import { Repository } from 'pxl-angular-common';
             <h2>Communauté</h2>
         </header>
 
-        <section class="container">
+        <section role="main" class="container">
             <div class="row">
                 <div class="col-md-2">
                     <div class="mb-4">

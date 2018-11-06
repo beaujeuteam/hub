@@ -5,7 +5,7 @@ import { Auth } from 'pxl-angular-auth';
 
 @Component({
     template: `
-        <section class="container">
+        <section role="main" class="container">
             <ul class="nav nav-pills mb-3" id="pills-tab" role="tablist">
                 <li class="nav-item">
                     <a class="nav-link active" data-toggle="pill" href="#main">Général</a>
