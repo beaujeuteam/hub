@@ -24,7 +24,7 @@ start: build-dev
 changelog: node_modules
 	$(BIN_DIR)/conventional-changelog -p angular -i CHANGELOG.md -s
 
-.PHONY: build-dev build clean doc start
+.PHONY: build-dev build clean doc start changelog
 
 node_modules: package.json
 	npm install --ignore-scripts

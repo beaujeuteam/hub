@@ -10,21 +10,21 @@ module.exports = (server) => {
     const gamesCtrl = new GamesController();
     const hooker = new Hooker(server);
 
-    server.addValidator('forum:categories:find', require('./../../config/schemas/find-categories.json'));
-    server.addValidator('forum:categories:get', require('./../../config/schemas/find-category.json'));
+    server.addValidator('forum:categories:find', require('./../../config/schemas/find-categories.json'), ['beaujeuteam']);
+    server.addValidator('forum:categories:get', require('./../../config/schemas/find-category.json'), ['beaujeuteam']);
     server.addValidator('forum:topics:pin', require('./../../config/schemas/pin-topic.json'), ['beaujeuteam:topics:pin']);
     server.addValidator('forum:topics:block', require('./../../config/schemas/block-topic.json'), ['beaujeuteam:topics:block']);
 
-    server.addValidator('games:insert', require('./../../config/schemas/insert-game.json'));
-    server.addValidator('games:search', require('./../../config/schemas/search-game.json'));
-    server.addValidator('games:search-one', require('./../../config/schemas/search-one-game.json'));
-    server.addValidator('games:get', require('./../../config/schemas/get-game.json'));
-    server.addValidator('games:users:insert', require('./../../config/schemas/insert-user.json'));
-    server.addValidator('games:users:delete', require('./../../config/schemas/delete-user.json'));
-    server.addValidator('games:users-to-play:insert', require('./../../config/schemas/insert-user-play.json'));
-    server.addValidator('games:users-to-play:delete', require('./../../config/schemas/delete-user-play.json'));
-    server.addValidator('games:users-to-own:insert', require('./../../config/schemas/insert-user-own.json'));
-    server.addValidator('games:users-to-own:delete', require('./../../config/schemas/delete-user-own.json'));
+    server.addValidator('games:insert', require('./../../config/schemas/insert-game.json'), ['beaujeuteam']);
+    server.addValidator('games:search', require('./../../config/schemas/search-game.json'), ['beaujeuteam']);
+    server.addValidator('games:search-one', require('./../../config/schemas/search-one-game.json'), ['beaujeuteam']);
+    server.addValidator('games:get', require('./../../config/schemas/get-game.json'), ['beaujeuteam']);
+    server.addValidator('games:users:insert', require('./../../config/schemas/insert-user.json'), ['beaujeuteam']);
+    server.addValidator('games:users:delete', require('./../../config/schemas/delete-user.json'), ['beaujeuteam']);
+    server.addValidator('games:users-to-play:insert', require('./../../config/schemas/insert-user-play.json'), ['beaujeuteam']);
+    server.addValidator('games:users-to-play:delete', require('./../../config/schemas/delete-user-play.json'), ['beaujeuteam']);
+    server.addValidator('games:users-to-own:insert', require('./../../config/schemas/insert-user-own.json'), ['beaujeuteam']);
+    server.addValidator('games:users-to-own:delete', require('./../../config/schemas/delete-user-own.json'), ['beaujeuteam']);
 
     server.on('forum:categories:find', (event, server) => forumCtrl.findCategories(event, server));
     server.on('forum:categories:get', (event, server) => forumCtrl.findCategory(event, server));
