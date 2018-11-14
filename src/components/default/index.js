@@ -6,6 +6,7 @@ import { TopicComponent } from './topic';
 import { WriteTopicComponent } from './write-topic';
 import { StreamComponent } from './stream';
 import { GameComponent } from './game';
+import { SearchComponent } from './search';
 
 export default [
     HomeComponent,
@@ -15,5 +16,6 @@ export default [
     TopicComponent,
     WriteTopicComponent,
     StreamComponent,
-    GameComponent
+    GameComponent,
+    SearchComponent
 ];

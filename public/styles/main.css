@@ -67,6 +67,10 @@ section[role=main] {
     padding: 0;
 }
 
+.topic-content h5:first-child {
+    display: none;
+}
+
 .topic-reply .card-content {
     margin-left: 66px;
 }

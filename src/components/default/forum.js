@@ -57,6 +57,10 @@ import { Repository, CommonUtils } from 'pxl-angular-common';
                                 <option value="oldest">Ancien</option>
                             </select>
                         </form>
+
+                        <a class="btn btn-outline-secondary" [routerLink]="['/search/topics']" title="Chercher un topic">
+                            <i class="fa fa-search"></i>
+                        </a>
                     </nav>
 
                     <div class="mb-4 mt-4">

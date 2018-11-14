@@ -39,6 +39,10 @@ import { Repository } from 'pxl-angular-common';
                             Nouveau message
                     </button>
 
+                    <a class="btn btn-outline-secondary" [routerLink]="['/search/messages']" title="Chercher un message">
+                        <i class="fa fa-search"></i>
+                    </a>
+
                     <social-write-message-component [parameters]="messageParameters"></social-write-message-component>
 
                     <div class="mb-4 mt-4">

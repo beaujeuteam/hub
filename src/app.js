@@ -15,6 +15,7 @@ import { TopicComponent } from './components/default/topic';
 import { WriteTopicComponent } from './components/default/write-topic';
 import { StreamComponent } from './components/default/stream';
 import { GameComponent } from './components/default/game';
+import { SearchComponent } from './components/default/search';
 import { CommunityMessagesComponent, CommunityGamesComponent, CommunityStreamsComponent } from './components/community';
 
 import defaultComponents from './components/default';
@@ -37,7 +38,9 @@ const routing = RouterModule.forRoot([
     { path: 'community/games', component: CommunityGamesComponent, canActivate: [Auth] },
     { path: 'community/streams', component: CommunityStreamsComponent, canActivate: [Auth] },
     { path: 'community/game/:id/:name', component: GameComponent, canActivate: [Auth] },
-    { path: 'stream/:username', component: StreamComponent, canActivate: [Auth] }
+    { path: 'stream/:username', component: StreamComponent, canActivate: [Auth] },
+    { path: 'search', component: SearchComponent, canActivate: [Auth] },
+    { path: 'search/:context', component: SearchComponent, canActivate: [Auth] }
 ], { useHash: true });
 
 @Component({
