@@ -1,6 +1,6 @@
 {
   "name": "beaujeuteam-hub",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Beaujeuteam web application",
   "main": "index.js",
   "scripts": {
