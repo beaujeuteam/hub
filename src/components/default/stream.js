@@ -4,7 +4,8 @@ import { StreamsRepository } from './../../services/streams';
 
 @Component({
     styles: [
-        '.comments-container { margin: 10px; padding: 0; list-style: none; }'
+        '.comments-container { margin: 10px; padding: 0; list-style: none; }',
+        '.img-fluid { width: 100%; }'
     ],
     template: `
         <section role="main" class="container">
@@ -14,12 +15,17 @@ import { StreamsRepository } from './../../services/streams';
                         <auth-user-avatar-component [username]="stream.user" class="mr-3"></auth-user-avatar-component>
                         <div class="media-body">
                             <auth-user-label-component [username]="stream.user"></auth-user-label-component>
-                            <h5>{{ stream.title }}</h5>
+                            <h5>
+                                {{ stream.title }}
+                                <small *ngIf="!stream.alive">(stream hors ligne)</small>
+                            </h5>
                         </div>
                     </header>
 
                     <div class="container-fluid">
+                        <img *ngIf="!stream.alive" class="img-fluid" [src]="stream.poster" [alt]="stream.title">
                         <stream-video-component
+                            *ngIf="stream.alive"
                             [auto]="true"
                             [poster]="stream.poster"
                             [id]="stream.key">
