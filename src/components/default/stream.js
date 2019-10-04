@@ -75,7 +75,7 @@ export class StreamComponent {
                     this.stream = query.result;
                     this.target = { type: 'stream', id: this.stream._id };
 
-                    const params = { target: this.target, sort: { created_at: 1 }}
+                    const params = { target: this.target, sort: { created_at: 1 } };
                     this.queryId = this.repository.subscribe('messages:find', params, (query) => {
                         this.comments = query.result;
                     });
